@@ -1,0 +1,39 @@
+import { z } from "zod";
+import Parser from 'rss-parser'
+import { MAX_FEED_LENGTH } from "@/constants";
+
+export type RssItem = {
+  title: string;
+  link: string;
+  isoDate: string;
+  comments?: string;
+}
+
+export type RssFeed = {
+  title: string;
+  description: string;
+  link: string;
+  items: Array<RssItem>
+}
+
+const parser = new Parser<RssFeed>();
+
+const paramsSchema = z.object({ url: z.string().url() });
+
+export async function GET(
+  request: Request,
+  { params }: { params: { url: string } }
+) {
+  const parsedParams = paramsSchema.safeParse(params);
+
+  if (!parsedParams.success) {
+    return new Response('Invalid URL', { status: 400 });
+  }
+
+  const { items, ...feedInfo }: RssFeed = await parser.parseURL(parsedParams.data.url);
+
+  return Response.json({
+    ...feedInfo,
+    items: items.slice(0, MAX_FEED_LENGTH),
+  });
+}
