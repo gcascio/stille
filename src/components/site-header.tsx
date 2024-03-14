@@ -13,7 +13,7 @@ export function SiteHeader() {
         <MainNav />
         <MobileNav />
         <div className="flex flex-1 items-center space-x-2 justify-end">
-          <nav className="flex items-center">
+          <nav className="flex gap-2 items-center">
             <Link
               href="https://github.com/gcascio/stille"
               target="_blank"
