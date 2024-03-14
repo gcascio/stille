@@ -1,8 +1,5 @@
-<h2 align="center" style="display: flex; align-items: center; justify-content: center; gap: 0.5em;">
-  <img src="https://stille.app/logo.png" alt="stille screenshots" />
-  <span style="letter-spacing: 0.1em;">
-    stille
-  </span>
+<h2 align="center">
+  <img src="https://stille.app/logofull.png" alt="stille logo" />
 </h2>
 
 <h2 align="center">stille is a web based RSS reader aimed at reducing distractions</h2>
