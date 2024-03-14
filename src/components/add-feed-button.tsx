@@ -152,10 +152,17 @@ export function AddFeedButton({
               onClick={() => onSuggestionSelect(suggestion)}
               className="flex gap-2 p-2 items-center rounded-md border bg-card text-card-foreground shadow-sm transition ease-in-out hover:scale-105"
             >
-              <Image src={suggestion.icon} alt={suggestion.iconAlt} width={40} height={40} />
+              <Image
+                src={suggestion.icon}
+                alt={suggestion.iconAlt}
+                placeholder="blur"
+                blurDataURL="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACgAAAAoCAYAAACM/rhtAAAAAXNSR0IArs4c6QAAAF9JREFUWEft0rENwCAQBEG+/95oxA04M0VsgqwhXwnN37zP/tbFb3wwXodgBFwECVaB2tsgwSpQexskWAVqb4MEq0DtbZBgFai9DRKsArW3QYJVoPY2SLAK1N4Gfy94AMPuk6mAwMJzAAAAAElFTkSuQmCC"
+                width={40}
+                height={40}
+              />
               <div>
-                <h3 className="font-bold">{suggestion.title}</h3>
-                <p className="text-sm text-muted-foreground">{suggestion.description}</p>
+                <h3 className="font-bold text-left">{suggestion.title}</h3>
+                <p className="text-sm text-muted-foreground text-left">{suggestion.description}</p>
               </div>
             </button>
           ))}
