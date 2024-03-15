@@ -16,8 +16,10 @@
 
 ## :rocket: Roadmap
 
-- CSV export of stored feeds
-- Share feed collections
+- [x] Feed groups
+- [ ] CSV export of stored feeds
+- [ ] Share feed collections
+- [ ] Favorite list
 
 ## :gear: Technologies used (roughly)
 
