@@ -17,7 +17,7 @@
 ## :rocket: Roadmap
 
 - [x] Feed groups
-- [ ] CSV export of stored feeds
+- [x] CSV export of stored feeds
 - [ ] Share feed collections
 - [ ] Favorite list
 
