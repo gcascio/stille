@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { type Feed, useStore, HOME_ID, type FeedGroup } from "@/lib/store"
+import { type Feed, useStore, HOME_ID, type FeedGroup, BOOKMARK_ID } from "@/lib/store"
 import { SquarePen, Trash2Icon } from "lucide-react"
 
 import { AddFeedButton } from "./add-feed-button"
@@ -63,7 +63,10 @@ export function SidebarNav() {
                   </ContextMenuItem>
                 </ContextMenuContent>
               </ContextMenu>
-              <AddFeedButton groupId={feedGroup.id} />
+              {feedGroup.id !== BOOKMARK_ID
+                ? <AddFeedButton groupId={feedGroup.id} />
+                : null
+              }
             </div>
             {feedGroup.feeds?.length ? (
               <SidebarNavItems

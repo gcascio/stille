@@ -1,20 +1,7 @@
 import { z } from "zod";
 import Parser from 'rss-parser'
 import { MAX_FEED_LENGTH } from "@/constants";
-
-export type RssItem = {
-  title: string;
-  link: string;
-  isoDate: string;
-  comments?: string;
-}
-
-export type RssFeed = {
-  title: string;
-  description: string;
-  link: string;
-  items: Array<RssItem>
-}
+import type { RssFeed } from "@/lib/types";
 
 const parser = new Parser<RssFeed>();
 

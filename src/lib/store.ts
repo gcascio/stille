@@ -3,9 +3,10 @@ import { persist } from 'zustand/middleware'
 import { nanoid } from 'nanoid'
 import { z } from 'zod';
 import { MAX_FEED_LENGTH } from '@/constants';
+import type { RssItem } from './types';
 
 export interface StoreError {
-  code: 'FEED_ALREADY_IN_GROUP';
+  code: 'FEED_ALREADY_IN_GROUP' | 'FEED_ALREADY_BOOKMARKED';
   message?: string;
 }
 
@@ -22,6 +23,8 @@ export interface FeedGroup {
   feeds: Array<Feed>;
 }
 
+export type FeedEntry = RssItem & { feedTitle: string; };
+
 export interface Settings {
   maxEntriesShown: number;
   sort: 'default' | 'newest';
@@ -36,6 +39,7 @@ export interface AppState {
     groupId: string;
     feedUrl?: string;
   };
+  bookmarks: Array<FeedEntry>;
   setHasHydrated: (state: boolean) => void;
   updateMaxEntriesShown: (maxEntriesShown: number) => void;
   updateSorting: (sorting: Settings['sort']) => void;
@@ -47,6 +51,9 @@ export interface AppState {
   addFeedToGroup: (groupId: FeedGroup['id'], feed: Feed) => void | StoreError;
   removeFeedFromGroup: (groupId: FeedGroup['id'], feed: Feed) => void;
   updateFeed: (groupId: FeedGroup['id'], feed: Feed, updateFeed: Partial<Pick<Feed, 'name'>>) => void;
+  bookmark: (feed: FeedEntry) => void;
+  removeBookmark: (feed: FeedEntry) => void;
+  isBookmarked: (feed: FeedEntry) => boolean;
 }
 
 const updateFeedGroupSchema = z
@@ -70,7 +77,8 @@ const updateFeedSchema = z
   );
 
 export const HOME_ID = 'home';
-
+export const BOOKMARK_ID = 'bookmark';
+const protectedGroupIds = [HOME_ID, BOOKMARK_ID];
 
 export const useStore = create<AppState>()(
   persist(
@@ -82,16 +90,23 @@ export const useStore = create<AppState>()(
       },
       settings: {
         maxEntriesShown: MAX_FEED_LENGTH,
-        sort: 'newest',
+        sort: 'newest' as const,
       },
       feedGroups: {
+        [BOOKMARK_ID]: {
+          id: BOOKMARK_ID,
+          name: 'Bookmarks',
+          position: 0,
+          feeds: [],
+        },
         [HOME_ID]: {
           id: HOME_ID,
           name: 'Home',
-          position: 0,
+          position: 1,
           feeds: [],
-        } 
+        },
       },
+      bookmarks: [],
       setHasHydrated: (state) => set({ hasHydrated: state }),
       updateMaxEntriesShown: (value) => {
         let maxEntriesShown = value;
@@ -154,7 +169,7 @@ export const useStore = create<AppState>()(
         }
       }),
       deleteFeedGroup: (id) => set((state) => {
-        if (id === HOME_ID) return state;
+        if (protectedGroupIds.includes(id)) return state;
 
         const { [id]: deletedGroup, ...feedGroups } = state.feedGroups
 
@@ -205,6 +220,7 @@ export const useStore = create<AppState>()(
               code: 'FEED_ALREADY_IN_GROUP',
               message: 'A feed with this URL is already in the group',
             };
+
             return state
           };
       
@@ -287,6 +303,67 @@ export const useStore = create<AppState>()(
           }
         }
       }),
+      bookmark: (feedEntry) => {
+        let error: StoreError | null = null;
+
+        set((state) => {
+          const bookmarks = state.bookmarks
+        
+          if (!bookmarks) return state;
+      
+          const isBookmarked = bookmarks.some(({ link }) => link === feedEntry.link);
+        
+          if (isBookmarked) {
+            error = {
+              code: 'FEED_ALREADY_BOOKMARKED',
+              message: 'A feed with this URL is already bookmarked',
+            };
+            return state
+          };
+
+          const isFirstBookmark = bookmarks.length === 0;
+      
+          return {
+            ...state,
+            bookmarks: [
+              ...bookmarks,
+              feedEntry,
+            ],
+            ...(isFirstBookmark && {
+              feedGroups: {
+                ...state.feedGroups,
+                [BOOKMARK_ID]: {
+                  ...state.feedGroups[BOOKMARK_ID]!,
+                  position: Object.keys(state.feedGroups).length,
+                }
+              }
+            })
+          }
+        })
+
+        if (error) return error;
+      },
+      removeBookmark: (feedEntry) => set((state) => {
+        const bookmarks = state.bookmarks;
+
+        if (!bookmarks) return state;
+
+        const filteredBookmarks = bookmarks.filter(({ link }) => link !== feedEntry.link);
+
+        return {
+          ...state,
+          bookmarks: [
+            ...filteredBookmarks,
+          ]
+        }
+      }),
+      isBookmarked: (feedEntry) => {
+        const bookmarks = get().bookmarks;
+
+        if (!bookmarks || bookmarks.length == 0) return false;
+        
+        return bookmarks.some(({ link }) => link === feedEntry.link)
+      },
     }),
     {
       name: 'app-state',
