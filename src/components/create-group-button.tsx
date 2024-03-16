@@ -59,7 +59,7 @@ export function CreateGroupButton() {
         <Form {...form}>
           <form
             id="createGroupForm"
-            className="grid gap-4 py-4"
+            className="grid gap-4"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField
@@ -78,6 +78,7 @@ export function CreateGroupButton() {
         </Form>
         <DialogFooter>
           <Button
+            className="w-full mt-2"
             type="submit"
             form="createGroupForm"
             disabled={!form.formState.isDirty}

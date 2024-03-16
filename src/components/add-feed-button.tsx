@@ -169,6 +169,7 @@ export function AddFeedButton({
         </div>)}
         <DialogFooter>
           <Button
+            className="w-full mt-2"
             type="submit"
             form="createGroupForm"
             disabled={!form.formState.isDirty}
