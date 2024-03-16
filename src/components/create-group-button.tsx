@@ -19,7 +19,7 @@ import { useState } from "react"
 import { useStore } from "@/lib/store"
 
 const formSchema = z.object({
-  name: z.string().min(2, {
+  name: z.string().trim().min(2, {
     message: "Name must be at least 2 characters.",
   }),
 })
@@ -59,7 +59,7 @@ export function CreateGroupButton() {
         <Form {...form}>
           <form
             id="createGroupForm"
-            className="grid gap-4 py-4"
+            className="grid gap-4"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField
@@ -77,7 +77,14 @@ export function CreateGroupButton() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" form="createGroupForm">Create</Button>
+          <Button
+            className="w-full mt-2"
+            type="submit"
+            form="createGroupForm"
+            disabled={!form.formState.isDirty}
+          >
+            Create
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

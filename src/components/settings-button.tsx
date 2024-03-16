@@ -20,6 +20,7 @@ import { useStore } from "@/lib/store"
 import { MAX_FEED_LENGTH } from "@/constants"
 import { SettingsIcon } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { useCsvExport } from "@/lib/useCsvExport"
 
 const formSchema = z.object({
   maxEntriesShown: z.coerce.number().min(0).max(MAX_FEED_LENGTH),
@@ -32,6 +33,7 @@ export function SettingsButton() {
   const [open, setOpen] = useState(false);
   const updateMaxEntriesShown = useStore((state) => state.updateMaxEntriesShown);
   const updateSorting = useStore((state) => state.updateSorting);
+  const exportCsv = useCsvExport();
   const maxEntriesShown = useStore((state) => state.settings.maxEntriesShown);
   const sort = useStore((state) => state.settings.sort);
   const form = useForm<FormSchema>({
@@ -66,7 +68,7 @@ export function SettingsButton() {
         <Form {...form}>
           <form
             id="createGroupForm"
-            className="grid gap-4 py-4"
+            className="grid gap-4"
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField
@@ -115,8 +117,27 @@ export function SettingsButton() {
             />
           </form>
         </Form>
+        <div className="flex gap-2 mt-2">
+          {exportCsv && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={exportCsv}
+            >
+              Export CSV
+            </Button>
+          )}
+        </div>
         <DialogFooter>
-          <Button type="submit" form="createGroupForm">Save</Button>
+          <Button
+            className="w-full mt-2"
+            type="submit"
+            form="createGroupForm"
+            disabled={!form.formState.isDirty}
+          >
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -53,10 +53,10 @@ const suggestions = [
 ]
 
 const formSchema = z.object({
-  name: z.string().min(2, {
+  name: z.string().trim().min(2, {
     message: "Name must be at least 2 characters.",
   }),
-  feedUrl: z.string().url(),
+  feedUrl: z.string().trim().url(),
 })
 
 type FormSchema = z.infer<typeof formSchema>;
@@ -89,8 +89,8 @@ export function AddFeedButton({
   }
 
   const onSuggestionSelect = (suggestion: typeof suggestions[number]) => {
-    form.setValue('feedUrl', suggestion.url)
-    form.setValue('name', suggestion.title)
+    form.setValue('feedUrl', suggestion.url, { shouldDirty: true });
+    form.setValue('name', suggestion.title, { shouldDirty: true });
   }
 
   return (
@@ -168,7 +168,14 @@ export function AddFeedButton({
           ))}
         </div>)}
         <DialogFooter>
-          <Button type="submit" form="createGroupForm">Add</Button>
+          <Button
+            className="w-full mt-2"
+            type="submit"
+            form="createGroupForm"
+            disabled={!form.formState.isDirty}
+          >
+            Add
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
