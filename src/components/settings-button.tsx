@@ -116,7 +116,13 @@ export function SettingsButton() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" form="createGroupForm">Save</Button>
+          <Button
+            type="submit"
+            form="createGroupForm"
+            disabled={!form.formState.isDirty}
+          >
+            Save
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

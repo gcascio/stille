@@ -19,7 +19,7 @@ import { useState } from "react"
 import { useStore } from "@/lib/store"
 
 const formSchema = z.object({
-  name: z.string().min(2, {
+  name: z.string().trim().min(2, {
     message: "Name must be at least 2 characters.",
   }),
 })
@@ -77,7 +77,13 @@ export function CreateGroupButton() {
           </form>
         </Form>
         <DialogFooter>
-          <Button type="submit" form="createGroupForm">Create</Button>
+          <Button
+            type="submit"
+            form="createGroupForm"
+            disabled={!form.formState.isDirty}
+          >
+            Create
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
