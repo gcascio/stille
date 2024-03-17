@@ -20,7 +20,13 @@ export interface NavItem {
   label?: string
 }
 
-export function SidebarNav() {
+interface SidebarNavProps {
+  onSelect?: () => void
+}
+
+export function SidebarNav({
+  onSelect
+}: SidebarNavProps) {
   const [editGroup, setEditGroup] = useState<FeedGroup>();
   const [editFeed, setEditFeed] = useState<{ groupId: string, feed: Feed }>();
   const feedGroups = useStore((state) => state.feedGroups);
@@ -29,6 +35,14 @@ export function SidebarNav() {
   const selectFeedGroup = useStore((state) => state.selectFeedGroup);
   const selectedFeedGroup = useStore((state) => state.selectedFeedGroup);
   const groups = Object.values(feedGroups);
+
+  const onSelectGroup = (groupId: string, feedUrl?: string) => {
+    if (onSelect) {
+      onSelect();
+    }
+
+    selectFeedGroup(groupId, feedUrl);
+  }
 
   return groups.length ? (
       <div className="w-full p-1">
@@ -39,7 +53,7 @@ export function SidebarNav() {
                 <ContextMenuTrigger asChild>
                   <Button
                     className="truncate font-semibold flex-1 justify-start"
-                    onClick={() => selectFeedGroup(feedGroup.id)}
+                    onClick={() => onSelectGroup(feedGroup.id)}
                     variant={!selectedFeedGroup.feedUrl && selectedFeedGroup.groupId === feedGroup.id ? 'secondary' : 'ghost'}
                   >
                     {feedGroup.name}
@@ -74,7 +88,7 @@ export function SidebarNav() {
                 groupId={feedGroup.id}
                 onDelete={removeFeedFromGroup}
                 onUpdate={setEditFeed}
-                onSelectGroup={selectFeedGroup}
+                onSelectGroup={onSelectGroup}
               />
             ) : null}
           </div>

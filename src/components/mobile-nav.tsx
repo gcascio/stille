@@ -66,7 +66,7 @@ export function MobileNav() {
         </MobileLink>
           <div className="flex flex-col my-4 pb-10 h-full">
             <ScrollArea className="flex-1 mb-4 pr-6">
-              <SidebarNav />
+              <SidebarNav onSelect={() => setOpen(false)} />
             </ScrollArea>
             <div className="flex gap-2 pr-6">
               <SettingsButton />
