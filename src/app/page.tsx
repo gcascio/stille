@@ -85,10 +85,8 @@ const Onboarding = () => (
     <h1 className="text-2xl font-semibold leading-none tracking-tight text-center mb-6">
       Welcome to stille
     </h1>
-    <p className="text-center">
+    <p className="text-center max-w-lg">
       stille is a web based RSS reader aimed at reducing distractions and focusing on the content.
-      <br />
-      Get started right away and add your first feed.
     </p>
     <p className="mt-6 text-center">
       <AddFeedButton groupId={HOME_ID} asIcon={false} withSuggestions />
