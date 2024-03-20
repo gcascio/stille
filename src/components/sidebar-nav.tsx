@@ -67,8 +67,10 @@ export function SidebarNav({
                     </div>
                   </ContextMenuItem>
                   <ContextMenuItem
-                    disabled={feedGroup.id === HOME_ID}
-                    destructive asChild onSelect={() => deleteFeedGroup(feedGroup.id)}
+                    disabled={feedGroup.id === HOME_ID || feedGroup.id === BOOKMARK_ID}
+                    destructive
+                    asChild
+                    onSelect={() => deleteFeedGroup(feedGroup.id)}
                   >
                     <div className="flex gap-2">
                       <Trash2Icon size={18} />
