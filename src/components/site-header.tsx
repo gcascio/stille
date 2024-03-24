@@ -16,7 +16,6 @@ export function SiteHeader() {
           <nav className="flex gap-2 items-center">
             <Link
               href="https://github.com/gcascio/stille"
-              target="_blank"
               rel="noreferrer"
             >
               <div
