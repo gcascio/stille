@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/utils"
 import { type Feed, useStore, HOME_ID, type FeedGroup, BOOKMARK_ID } from "@/lib/store"
-import { SquarePen, Trash2Icon } from "lucide-react"
+import { SquarePen, Trash2Icon, Share2 } from "lucide-react"
 
 import { AddFeedButton } from "./add-feed-button"
 import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from "./ui/context-menu"
@@ -10,6 +10,7 @@ import { UpdateGroupDialog } from "./update-group-dialog"
 import { useState } from "react"
 import { UpdateFeedDialog } from "./update-feed-dialog"
 import { Button } from "./ui/button"
+import { ShareGroupDialog } from "./share-group-dialog"
 
 export interface NavItem {
   title: string
@@ -28,6 +29,7 @@ export function SidebarNav({
   onSelect
 }: SidebarNavProps) {
   const [editGroup, setEditGroup] = useState<FeedGroup>();
+  const [shareGroup, setShareGroup] = useState<FeedGroup>();
   const [editFeed, setEditFeed] = useState<{ groupId: string, feed: Feed }>();
   const feedGroups = useStore((state) => state.feedGroups);
   const deleteFeedGroup = useStore((state) => state.deleteFeedGroup);
@@ -60,12 +62,20 @@ export function SidebarNav({
                   </Button>
                 </ContextMenuTrigger>
                 <ContextMenuContent className="w-64">
-                  <ContextMenuItem onSelect={() => setEditGroup(feedGroup)}>
+                  <ContextMenuItem onSelect={() => setEditGroup(feedGroup)} >
                     <div className="flex gap-2">
                       <SquarePen size={18} />
                       Edit
                     </div>
                   </ContextMenuItem>
+
+                  <ContextMenuItem onSelect={() => setShareGroup(feedGroup)} >
+                    <div className="flex gap-2">
+                      <Share2 size={18} />
+                      Share
+                    </div>
+                  </ContextMenuItem>
+
                   <ContextMenuItem
                     disabled={feedGroup.id === HOME_ID || feedGroup.id === BOOKMARK_ID}
                     destructive
@@ -97,6 +107,7 @@ export function SidebarNav({
         ))}
         {editGroup ? <UpdateGroupDialog feedGroup={editGroup} onOpenChange={setEditGroup} /> : null}
         {editFeed ? <UpdateFeedDialog groupId={editFeed.groupId} feed={editFeed.feed} onOpenChange={setEditFeed}  /> : null}
+        {shareGroup ? <ShareGroupDialog feedGroup={shareGroup} onOpenChange={setShareGroup} /> : null}
       </div>
   ) : null
 }

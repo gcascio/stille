@@ -30,6 +30,8 @@ export interface Settings {
   sort: 'default' | 'newest';
 }
 
+export type ShareableFeedStore = Pick<AppState, 'version' | 'feedGroups' | 'bookmarks'> | Pick<AppState, 'version' | 'feedGroups'>;
+
 export interface AppState {
   version: number;
   hasHydrated: boolean;
@@ -54,6 +56,13 @@ export interface AppState {
   bookmark: (feed: FeedEntry) => void;
   removeBookmark: (feed: FeedEntry) => void;
   isBookmarked: (feed: FeedEntry) => boolean;
+  getShareableStore: (
+    options?: {
+      withBookmarks?: boolean;
+      groupId?: string;
+    }
+  ) => ShareableFeedStore;
+  mergeShareableStore: (shareableStore: ShareableFeedStore) => void;
 }
 
 const updateFeedGroupSchema = z
@@ -364,6 +373,42 @@ export const useStore = create<AppState>()(
         
         return bookmarks.some(({ link }) => link === feedEntry.link)
       },
+      getShareableStore: (options) => {
+        const { version, feedGroups, bookmarks } = get();
+
+        const withBookmarks = options?.withBookmarks ?? false;
+        const groups = options?.groupId
+          ? { [options.groupId]: feedGroups[options.groupId]! }
+          : feedGroups;
+  
+        return {
+          version,
+          feedGroups: groups,
+          ...(withBookmarks && { bookmarks }),
+        }
+      },
+      mergeShareableStore: (shareableStore) => {
+        set((state) => {
+          const { feedGroups } = shareableStore;
+          const bookmarks = 'bookmarks' in shareableStore ? shareableStore.bookmarks : [];
+
+          const deduplicatedBookmarks = bookmarks
+            .filter((bookmark) => !state.bookmarks.some(({ link }) => link === bookmark.link));
+  
+          return {
+            ...state,
+            feedGroups: {
+              ...state.feedGroups,
+              ...feedGroups,
+            },
+            bookmarks: [
+              ...state.bookmarks,
+              ...deduplicatedBookmarks,
+            ]
+          }
+        })
+      
+      }
     }),
     {
       name: 'app-state',

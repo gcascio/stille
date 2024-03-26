@@ -4,12 +4,16 @@ import { Button } from "@/components/ui/button"
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { useForm, type SubmitHandler } from "react-hook-form"
 import { z } from "zod"
@@ -21,6 +25,7 @@ import { MAX_FEED_LENGTH } from "@/constants"
 import { SettingsIcon } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { useCsvExport } from "@/lib/useCsvExport"
+import { ShareFeedsForm } from "./share-feeds-form"
 
 const formSchema = z.object({
   maxEntriesShown: z.coerce.number().min(0).max(MAX_FEED_LENGTH),
@@ -58,87 +63,106 @@ export function SettingsButton() {
           <SettingsIcon size={20} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="flex flex-col sm:max-w-[425px] min-h-[500px]">
         <DialogHeader>
           <DialogTitle>Settings</DialogTitle>
-          <DialogDescription>
-            Adjust the way you like to to organize your feeds.
-          </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            id="createGroupForm"
-            className="grid gap-4"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <FormField
-              control={form.control}
-              name="sort"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Sorting of feed groups</FormLabel>
-                  <FormControl>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select sorting" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="default">Default</SelectItem>
-                        <SelectItem value="newest">Newest first</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
 
-            <FormField
-              control={form.control}
-              name="maxEntriesShown"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Max feeds shown in group</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={1}
-                      max={MAX_FEED_LENGTH}
-                      placeholder="Max entries shown"
-                      aria-label="Max entries shown"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </form>
-        </Form>
-        <div className="flex gap-2 mt-2">
-          {exportCsv && (
+        <Tabs defaultValue="general" className="w-full">
+          <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="share">Share</TabsTrigger>
+            <TabsTrigger value="export">Export</TabsTrigger>
+          </TabsList>
+          <TabsContent value="general">
+
+            <Form {...form}>
+              <form
+                id="createGroupForm"
+                className="grid gap-4"
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
+                <FormField
+                  control={form.control}
+                  name="sort"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sorting of feed groups</FormLabel>
+                      <FormControl>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select sorting" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="default">Default</SelectItem>
+                            <SelectItem value="newest">Newest first</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="maxEntriesShown"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Max feeds shown in group</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={1}
+                          max={MAX_FEED_LENGTH}
+                          placeholder="Max entries shown"
+                          aria-label="Max entries shown"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </form>
+            </Form>
+
             <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={exportCsv}
+              className="w-full mt-6"
+              type="submit"
+              form="createGroupForm"
+              disabled={!form.formState.isDirty}
             >
-              Export CSV
+              Save
             </Button>
-          )}
-        </div>
-        <DialogFooter>
-          <Button
-            className="w-full mt-2"
-            type="submit"
-            form="createGroupForm"
-            disabled={!form.formState.isDirty}
-          >
-            Save
-          </Button>
-        </DialogFooter>
+          </TabsContent>
+
+          <TabsContent value="share">
+            <p className="text-muted-foreground mb-6">
+              Share your feed groups and bookmarks. You can also share single groups by right clicking on them.
+            </p>
+            <ShareFeedsForm />
+          </TabsContent>
+
+          <TabsContent value="export">
+            <p className="text-muted-foreground mb-6">
+              Export your feed groups and bookmarks to a CSV file for backup purposes
+              or to import them to stille or another tool.
+            </p>
+            {exportCsv && (
+              <Button
+                className="w-full"
+                type="button"
+                size="sm"
+                onClick={exportCsv}
+              >
+                Export CSV
+              </Button>
+            )}
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   )
