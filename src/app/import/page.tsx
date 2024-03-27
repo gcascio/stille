@@ -1,6 +1,6 @@
 'use client'
 
-import { useStore } from "@/lib/store";
+import { useStore, type ShareableFeedStore } from "@/lib/store";
 import { unstable_noStore as noStore } from "next/cache";
 import { useSearchParams } from "next/navigation";
 import { shareableFeedStoreSchema } from "@/lib/validation";
@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Loader2, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { CsvUpload } from "@/components/csv-upload";
 
 export default function Import() {
   noStore();
@@ -19,32 +20,42 @@ export default function Import() {
   const [loading, setLoading] = useState(!!id);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState(false);
+  const [shareableStore, setShareableStore] = useState<ShareableFeedStore>()
 
-  const importRemote = useCallback(async (id: string) => {
+  const loadRemote = useCallback(async (id: string) => {
     setLoading(true);
 
     try {
       const response = await fetch(`/api/share?id=${id}`);
       const data = await response.json() as unknown;
-      console.log('== data: ', data);
       const shareableFeeds = shareableFeedStoreSchema.parse(data);
 
-      mergeShareableStore(shareableFeeds);
-
-      setSuccess(true);
+      setShareableStore(shareableFeeds);
     } catch (error) {
       console.error('Failed to import remote feed', error);
       setError(true);
     }
 
     setLoading(false);
-  }, [mergeShareableStore]);
+  }, []);
 
   useEffect(() => {
     if (!id || !storeHasHydrated) return;
 
-    void importRemote(id);
-  }, [id, storeHasHydrated, importRemote]);
+    void loadRemote(id);
+  }, [id, storeHasHydrated, loadRemote]);
+
+  useEffect(() => {
+    if (!shareableStore) return;
+
+    try {
+      mergeShareableStore(shareableStore);
+      setSuccess(true);
+    } catch (error) {
+      console.error('Failed to import remote feed', error);
+      setError(true);
+    }
+  }, [mergeShareableStore, shareableStore]);
 
   return (
     <div className="flex justify-center items-center p-8 w-full">
@@ -54,8 +65,14 @@ export default function Import() {
           <CardDescription>Import feeds to sync devices or explore new content</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col justify-center items-center">
+          <div className="flex flex-col justify-center items-center gap-6">
             <Status success={success} error={error} loading={loading} />
+            {!id && (
+              <CsvUpload
+                onUpload={setShareableStore}
+                className="w-full h-40"
+              />
+            )}
           </div>
         </CardContent>
         <CardFooter>
@@ -73,7 +90,7 @@ const Status = ({ success, error, loading }: { success: boolean; error: boolean;
     return (
       <>
         <CheckCircle size={80} className="text-green-500" />
-        <p className="mt-6 text-muted-foreground">Import successful</p>
+        <p className="text-muted-foreground">Import successful</p>
       </>
     )
   }
@@ -82,15 +99,19 @@ const Status = ({ success, error, loading }: { success: boolean; error: boolean;
     return (
       <>
         <XCircle size={80} className="text-red-500" />
-        <p className="mt-6 text-muted-foreground">Failed to import feeds</p>
+        <p className="text-muted-foreground">Failed to import feeds</p>
       </>
     )
   }
 
-  return (
-    <>
-      <Loader2 size={80} className="animate-spin" />
-      <p className="mt-6 text-muted-foreground">Importing feeds</p>
-    </>
-  )
+  if (loading) {
+    return (
+      <>
+        <Loader2 size={80} className="animate-spin" />
+        <p className="text-muted-foreground">Importing feeds</p>
+      </>
+    )
+  }
+
+  return null;
 }

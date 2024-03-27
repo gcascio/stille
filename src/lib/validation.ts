@@ -25,4 +25,23 @@ export const shareableFeedStoreSchema = z.object({
   bookmarks: z.array(feedEntrySchema).optional(),
 });
 
+export const feedGroupCsvEntrySchema = z.object({
+  groupId: z.string(),
+  group: z.string(),
+  groupPosition: z.number(),
+  feed: z.string(),
+  feedUrl: z.string(),
+});
+
+export const bookmarkCsvEntrySchema = z.object({
+  feedTitle: z.string(),
+  title: z.string(),
+  link: z.string(),
+});
+
 export type ShareableFeedStoreSchema = z.infer<typeof shareableFeedStoreSchema>;
+
+export type FeedGroupCsvEntry = z.infer<typeof feedGroupCsvEntrySchema>;
+
+export type BookmarkCsvEntry = z.infer<typeof bookmarkCsvEntrySchema>;
+
