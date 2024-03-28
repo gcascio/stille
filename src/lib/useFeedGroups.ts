@@ -17,7 +17,13 @@ export const useFeedGroups = () => {
 
   const results = useQueries({
     queries: feedUrls.map((url) => (
-      { queryKey: ['feed', url], queryFn: () => fetchFeed(url), staleTime: Infinity }
+      { 
+        queryKey: ['feed', url],
+        queryFn: () => fetchFeed(url),
+        staleTime: Infinity,
+        refetchOnWindowFocus: false,
+        refetchOnReconnect: false,
+      }
     )),
   })
 
