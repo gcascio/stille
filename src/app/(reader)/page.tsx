@@ -8,6 +8,7 @@ import { unstable_noStore as noStore } from "next/cache";
 import { BookmarkIcon } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { useFeedGroups } from "@/lib/useFeedGroups";
+import { BrandText } from "@/components/brand-text";
 
 export default function Home() {
   noStore();
@@ -83,7 +84,7 @@ const FeedItem = ({ item }: { item: RssItem & { feedTitle: string } }) => {
 const Onboarding = () => (
   <div className="flex flex-col items-center justify-center h-full">
     <h1 className="text-2xl font-semibold leading-none tracking-tight text-center mb-6">
-      Welcome to stille
+      Welcome to <BrandText />
     </h1>
     <p className="text-center max-w-lg">
       stille is a web based RSS reader aimed at reducing distractions and focusing on the content.
